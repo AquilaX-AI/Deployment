@@ -1,0 +1,43 @@
+services:
+
+  aquilax-server:
+    image: registry.gitlab.com/aquila-x/aquilax-server
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+    depends_on:
+      - mongo
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    entrypoint: ["python3","app.py"]
+
+
+  aquilax-jobs:
+    image: registry.gitlab.com/aquila-x/aquilax-server
+    restart: always
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    entrypoint: ["python3","jobs.py"]
+
+  aquilax-worker:
+    image: registry.gitlab.com/aquila-x/aquilax-worker
+    restart: always
+    depends_on:
+      - aquilax-server
+    env_file:
+      - .env
+    entrypoint: ["python3","app.py"]
+
+  mongo:
+    image: mongo:4.4.28
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ""
+      MONGO_INITDB_ROOT_PASSWORD: ""
+    volumes:
+      - ./data:/data/db
