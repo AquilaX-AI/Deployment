@@ -1,5 +1,16 @@
 services:
 
+  haproxy:
+    image: haproxy:2.9.2-alpine
+    restart: always
+    depends_on:
+      - aquilax-server
+    ports:
+      - 443:443
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./haproxy/certs:/certs/:ro
+      
   aquilax-server:
     image: registry.gitlab.com/aquila-x/aquilax-server
     restart: always
